@@ -6,10 +6,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.container.CloseableRowIterator;
+import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -58,7 +62,7 @@ public class FreesurferRearrangerNodeModel extends NodeModel {
     protected FreesurferRearrangerNodeModel() {
     
         //2 tables as input, 2 as output
-        super(3, 2);
+        super(2, 1);
     }
 
     /**
@@ -99,14 +103,11 @@ public class FreesurferRearrangerNodeModel extends NodeModel {
     		String name = inData[1].getSpec().getColumnNames()[i];
     		DataType type = inData[1].getSpec().getColumnSpec(i).getType();
     		columnSpecCAD[i] = new DataColumnSpecCreator(name, type).createSpec();
-    		columnSpecADNI[i] = new DataColumnSpecCreator(name, type).createSpec();
     	}
     	
     	outputCAD = new DataTableSpec(columnSpecCAD);
-    	outputADNI = new DataTableSpec(columnSpecADNI);
     	
     	BufferedDataContainer containerCAD = exec.createDataContainer(outputCAD);
-    	BufferedDataContainer containerADNI = exec.createDataContainer(outputADNI);
     	
     	//Generate a column map
     	//Hash<CADColumnIndex> -> ADNIColumnIndex
@@ -123,14 +124,26 @@ public class FreesurferRearrangerNodeModel extends NodeModel {
     	
     	//Rearrange columns
     	//CAD needs to be in ADNI format
-    	
+    	//for (int r = 0; r < inData[0].getRowCount(); r++) {
+    	CloseableRowIterator iter = inData[0].iterator();
+    		while (iter.hasNext()) {
+    			DataRow rowCAD = iter.next();
+    			DataCell[] cells = new DataCell[rowCAD.getNumCells()];
+    			
+    			for (int c = 0; c < rowCAD.getNumCells(); c++) {
+    				cells[columnMap.get(c)] = rowCAD.getCell(c);
+    			}
+    			
+    			System.out.println("Key: " + rowCAD.getKey());
+    			DataRow newRow = new DefaultRow(rowCAD.getKey(), cells);
+    			containerCAD.addRowToTable(newRow);
+    		}
+    	//}
     	
     	containerCAD.close();
-    	containerADNI.close();
         
         return new BufferedDataTable[] { 
-        	containerCAD.getTable(),
-        	containerADNI.getTable()
+        	containerCAD.getTable()
         };
     }
 
