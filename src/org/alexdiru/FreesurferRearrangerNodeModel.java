@@ -3,21 +3,16 @@ package org.alexdiru;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
-import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.def.IntCell;
-import org.knime.core.data.def.StringCell;
+import org.knime.core.data.DataType;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -25,6 +20,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 
 
 /**
@@ -91,49 +87,51 @@ public class FreesurferRearrangerNodeModel extends NodeModel {
     	//Testing shows the column names are the same
     	//So they just need to be rearranged
         
-        // the data table spec of the single output table, 
-        // the table will have three columns:
-        DataColumnSpec[] allColSpecs = new DataColumnSpec[3];
-        allColSpecs[0] = 
-            new DataColumnSpecCreator("Column 0", StringCell.TYPE).createSpec();
-        allColSpecs[1] = 
-            new DataColumnSpecCreator("Column 1", DoubleCell.TYPE).createSpec();
-        allColSpecs[2] = 
-            new DataColumnSpecCreator("Column 2", IntCell.TYPE).createSpec();
-        DataTableSpec outputSpec = new DataTableSpec(allColSpecs);
-        // the execution context will provide us with storage capacity, in this
-        // case a data container to which we will add rows sequentially
-        // Note, this container can also handle arbitrary big data tables, it
-        // will buffer to disc if necessary.
-        BufferedDataContainer container = exec.createDataContainer(outputSpec);
-        BufferedDataContainer container2 = exec.createDataContainer(outputSpec);
+    	
+    	//Just output the two input tables
+    	DataColumnSpec[] columnSpecCAD = new DataColumnSpec[inData[1].getSpec().getColumnNames().length];
+    	DataColumnSpec[] columnSpecADNI = new DataColumnSpec[inData[1].getSpec().getColumnNames().length];
+    	
+    	DataTableSpec outputCAD, outputADNI;
+    	
+    	//Column formats
+    	for (int i = 0; i < columnSpecCAD.length; i++) {
+    		String name = inData[1].getSpec().getColumnNames()[i];
+    		DataType type = inData[1].getSpec().getColumnSpec(i).getType();
+    		columnSpecCAD[i] = new DataColumnSpecCreator(name, type).createSpec();
+    		columnSpecADNI[i] = new DataColumnSpecCreator(name, type).createSpec();
+    	}
+    	
+    	outputCAD = new DataTableSpec(columnSpecCAD);
+    	outputADNI = new DataTableSpec(columnSpecADNI);
+    	
+    	BufferedDataContainer containerCAD = exec.createDataContainer(outputCAD);
+    	BufferedDataContainer containerADNI = exec.createDataContainer(outputADNI);
+    	
+    	//Generate a column map
+    	//Hash<CADColumnIndex> -> ADNIColumnIndex
+    	Map<Integer, Integer> columnMap = new HashMap<Integer, Integer>();
+    	
+    	for (int i = 0; i < columnSpecCAD.length; i++) {
+    		String cadColumnName = inData[0].getSpec().getColumnNames()[i];
+    		for (int j = 0; j < columnSpecCAD.length; j++)
+    			if (inData[1].getSpec().getColumnNames()[j].equals(cadColumnName)) {
+    				columnMap.put(i, j);
+    				break;
+    			}
+    	}
+    	
+    	//Rearrange columns
+    	//CAD needs to be in ADNI format
+    	
+    	
+    	containerCAD.close();
+    	containerADNI.close();
         
-        // let's add m_count rows to it
-        for (int i = 0; i < m_count.getIntValue(); i++) {
-            RowKey key = new RowKey("Row " + i);
-            // the cells of the current row, the types of the cells must match
-            // the column spec (see above)
-            DataCell[] cells = new DataCell[3];
-            cells[0] = new StringCell("String_" + i); 
-            cells[1] = new DoubleCell(0.5 * i); 
-            cells[2] = new IntCell(i);
-            DataRow row = new DefaultRow(key, cells);
-            container.addRowToTable(row);
-            container2.addRowToTable(row);
-            
-            // check if the execution monitor was canceled
-            exec.checkCanceled();
-            exec.setProgress(i / (double)m_count.getIntValue(), 
-                "Adding row " + i);
-        }
-        // once we are done, we close the container and return its table
-        container.close();
-        container2.close();
-        BufferedDataTable out = container.getTable();
-        BufferedDataTable out2 = container2.getTable();
-        
-        BufferedDataTable[] outputs = new BufferedDataTable[] { out, out2 };
-        return outputs;
+        return new BufferedDataTable[] { 
+        	containerCAD.getTable(),
+        	containerADNI.getTable()
+        };
     }
 
     /**
