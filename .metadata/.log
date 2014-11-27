@@ -1,0 +1,10 @@
+!SESSION 2014-11-27 12:13:19.038 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.7.0_60
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_GB
+Framework arguments:  -application org.eclipse.ui.ide.workbench
+Command-line arguments:  -application org.eclipse.ui.ide.workbench -data /home/alex/knime-workspace/FreesurferRearranger -dev file:/home/alex/knime-workspace/.metadata/.plugins/org.eclipse.pde.core/KNIME/dev.properties -os linux -ws gtk -arch x86_64 -consoleLog
+
+!ENTRY org.eclipse.ui 4 4 2014-11-27 12:13:26.204
+!MESSAGE Plug-in 'org.knime.workbench.ui' contributed an invalid Menu Extension (Path: 'view' is invalid): org.knime.workbench.ui.openLogfile
