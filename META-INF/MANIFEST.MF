@@ -1,15 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FreesurferRearranger-Node extension for KNIME Workbench
-Bundle-SymbolicName: org.alexdiru; singleton:=true
+Bundle-SymbolicName: org.alexdiru.freesurferrearranger;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-ClassPath: freesurferrearranger.jar
-Bundle-Activator: org.alexdiru.FreesurferRearrangerNodePlugin
+Bundle-Activator: org.alexdiru.freesurferrearranger.FreesurferRearrangerNodePlugin
 Bundle-Vendor: Alex Spedding
 Require-Bundle: org.eclipse.core.runtime,
  org.knime.workbench.core,
  org.knime.workbench.repository,
  org.knime.base
 Bundle-ActivationPolicy: lazy
-Export-Package: org.alexdiru
+Export-Package: org.alexdiru.freesurferrearranger
 

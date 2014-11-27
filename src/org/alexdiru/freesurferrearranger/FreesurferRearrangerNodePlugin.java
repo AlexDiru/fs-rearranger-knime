@@ -2,7 +2,7 @@
  * $Revision$ $Date$ $Author$
  *
  */
-package org.alexdiru;
+package org.alexdiru.freesurferrearranger;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;

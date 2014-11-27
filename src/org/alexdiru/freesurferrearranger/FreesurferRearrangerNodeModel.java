@@ -1,4 +1,4 @@
-package org.alexdiru;
+package org.alexdiru.freesurferrearranger;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,21 +124,20 @@ public class FreesurferRearrangerNodeModel extends NodeModel {
     	
     	//Rearrange columns
     	//CAD needs to be in ADNI format
-    	//for (int r = 0; r < inData[0].getRowCount(); r++) {
     	CloseableRowIterator iter = inData[0].iterator();
-    		while (iter.hasNext()) {
-    			DataRow rowCAD = iter.next();
-    			DataCell[] cells = new DataCell[rowCAD.getNumCells()];
-    			
-    			for (int c = 0; c < rowCAD.getNumCells(); c++) {
-    				cells[columnMap.get(c)] = rowCAD.getCell(c);
-    			}
-    			
-    			System.out.println("Key: " + rowCAD.getKey());
-    			DataRow newRow = new DefaultRow(rowCAD.getKey(), cells);
-    			containerCAD.addRowToTable(newRow);
-    		}
-    	//}
+		while (iter.hasNext()) {
+			DataRow rowCAD = iter.next();
+			DataCell[] cells = new DataCell[rowCAD.getNumCells()];
+			
+			for (int c = 0; c < rowCAD.getNumCells(); c++) {
+				cells[columnMap.get(c)] = rowCAD.getCell(c);
+			}
+			
+			System.out.println("Key: " + rowCAD.getKey());
+			DataRow newRow = new DefaultRow(rowCAD.getKey(), cells);
+			containerCAD.addRowToTable(newRow);
+		}
+    	
     	
     	containerCAD.close();
         

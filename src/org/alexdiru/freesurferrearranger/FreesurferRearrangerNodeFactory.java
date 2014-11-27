@@ -1,4 +1,4 @@
-package org.alexdiru;
+package org.alexdiru.freesurferrearranger;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
